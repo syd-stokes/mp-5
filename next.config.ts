@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   reactCompiler: true,
+  compiler: {
+    styledComponents: true,
+  },
 };
 
 export default nextConfig;
