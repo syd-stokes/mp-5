@@ -1,5 +1,5 @@
-import ShortenForm from "@/components/ShortenForm";
+import UrlShortener from "@/components/UrlShortener";
 
 export default function Home() {
-  return <ShortenForm />;
+  return <UrlShortener />;
 }

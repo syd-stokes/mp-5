@@ -1,6 +1,7 @@
 "use server";
 import getCollection, { URLS_COLLECTION } from "@/db";
 import { AliasProps } from "@/type";
+import createFailedResult from "@/lib/createFailedResult";
 
 // helper function to validate URLs:
 function isValidUrl(input: string): boolean {
@@ -79,42 +80,21 @@ export default async function createNewAlias(
     console.log("creating new alias");
     const p = {
         alias: alias.trim(),
-        url: url.trim(),    // trim?
+        url: url.trim(),   
     };
 
     // if URL is invalid, return error:
-    if (!isValidUrl(p.url)) {
-        return {
-            success: false,
-            errorMessage: "Invalid URL: Could not verify URL. Please try again.",
-            alias: "",
-            originalURL: "",
-        };
-  }
+    if (!isValidUrl(p.url)) return createFailedResult("Invalid URL: Could not verify URL. Please try again.");
 
     // if alias is invalid, return error:
-    if (!isValidAlias(p.alias)) {
-        return {
-            success: false,
-            errorMessage: "Invalid alias: You may only use valid URL characters.",
-            alias: "",
-            originalURL: "",
-        };
-    }
+    if (!isValidAlias(p.alias)) return createFailedResult("Invalid alias: You may only use valid URL characters.");
 
     // get MongoDB collection
     const urlsCollection = await getCollection(URLS_COLLECTION);
 
     // check if alias already exists, and reject the duplicate if it does:
     const existing = await urlsCollection.findOne({ alias: p.alias });
-    if (existing !== null) {
-        return {
-            success: false,
-            errorMessage: "Invalid alias: This alias already exists.",
-            alias: "",
-            originalURL: "",
-        };
-    }
+    if (existing !== null) return createFailedResult("Invalid alias: This alias already exists.");
 
     // insert in DB
     const res = await urlsCollection.insertOne({ ...p });   
